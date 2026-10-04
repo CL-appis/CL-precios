@@ -1,0 +1,16 @@
+{
+  "name": "Calculadora de Precios",
+  "short_name": "Precios",
+  "description": "Calculadora de precios para fotolibros y productos, con comisiones de Mercado Pago y Mercado Libre",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f4f8f9",
+  "theme_color": "#4a90a4",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,31 @@
+CALCULADORA DE PRECIOS — Paquete para GitHub Pages / APK
+==========================================================
+
+6 archivos: index.html, manifest.json, service-worker.js,
+icon-192.png, icon-512.png, icon-maskable-512.png.
+
+PASO 1 — Subir a GitHub
+------------------------------------------------------------------
+1. Creá un repositorio nuevo en GitHub (distinto al de Mi Taller,
+   para que no se mezclen).
+2. Subí estos 6 archivos ahí (Add file > Upload files).
+3. Andá a Settings > Pages, elegí la rama "main" y la carpeta
+   "/ (root)", guardá.
+4. Esperá un minuto y en esa misma pantalla te va a aparecer el
+   link público, tipo https://tuusuario.github.io/nombre-repo/
+
+PASO 2 — Generar el APK
+------------------------------------------------------------------
+1. Andá a pwabuilder.com, pegá ese link y tocá Start.
+2. Elegí Android y descargá el paquete — te da el .apk.
+
+PASO 3 — Instalar en el celular
+------------------------------------------------------------------
+Pasate el .apk al celular, abrilo, aceptá instalar de "fuentes
+desconocidas" para ese archivo, instalá, listo.
+
+IMPORTANTE
+------------------------------------------------------------------
+Esta calculadora guarda sus datos por separado de Mi Taller — son
+dos apps distintas, con dos "casilleros" de datos distintos, aunque
+las instales las dos en el mismo celular.

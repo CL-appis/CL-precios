@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de Precios</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4a90a4">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f8f9;--surface:#fff;--text:#26333a;--muted:#78939a;--accent:#4a90a4;--accentsoft:#dceef2;
+--ok:#5a8b74;--oksoft:#e1efe8;--warn:#c9973f;--bad:#c1584b;--border:#dfe9ec;--r:16px;--rs:10px;}
+*{box-sizing:border-box}
+input[type=checkbox],input[type=radio]{width:auto}
+body{margin:0;min-height:100%;background:linear-gradient(160deg,#eef5f6,#e7f1f3 45%,#dfeaee);font-family:'Nunito',sans-serif;color:var(--text);display:flex;justify-content:center;
+padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+h1,h2,h3,h4{font-family:'Quicksand',sans-serif;font-weight:700;margin:0 0 8px}
+.shell{width:100%;max-width:680px;background:var(--bg);min-height:100vh}
+@media(min-width:720px){body{padding:24px 0}.shell{border-radius:24px;border:1px solid var(--border);overflow:hidden;box-shadow:0 0 50px rgba(38,51,58,.10)}}
+header{position:sticky;top:0;z-index:10;background:var(--bg);padding:16px 18px;border-bottom:1px solid var(--border)}
+header h1{font-size:20px;color:var(--accent);display:inline-block}
+main{max-width:640px;margin:0 auto;padding:18px 14px 90px}
+.card{background:var(--surface);border-radius:var(--r);box-shadow:0 2px 10px rgba(38,51,58,.06);padding:16px 18px;margin-bottom:14px}
+.ct{font-size:13px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);font-weight:700;margin-bottom:8px}
+.big{font-size:26px;font-weight:800;font-family:'Quicksand'}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:560px){.grid2{grid-template-columns:1fr}}
+label{font-size:13px;font-weight:700;color:var(--muted);display:block;margin:8px 0 3px}
+input,select,textarea{font-family:'Nunito';font-size:15px;padding:9px 11px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text);width:100%;color-scheme:light}
+.btn{font-family:'Quicksand';font-weight:700;font-size:14px;border:1.5px solid var(--accent);border-radius:var(--rs);padding:10px 16px;cursor:pointer;background:var(--surface);color:var(--accent)}
+.btn.p{background:var(--accent);color:#fff;border:none}
+.btn.d{color:var(--bad);border-color:var(--bad)}
+.btn.big{width:100%;padding:15px;font-size:16px}
+.row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);gap:10px}
+.row:last-child{border:none}
+.meta{color:var(--muted);font-size:13px}
+.fila{display:flex;gap:6px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
+.fila input[type=checkbox]{flex:0 0 auto;margin-right:2px}
+.fila input[type=text]{flex:2;min-width:100px}.fila select{flex:1;min-width:110px}.fila input[type=number]{width:88px;flex:0 0 auto}
+.fila .lbl{font-size:13px;color:var(--muted);flex:0 0 auto}
+.link{background:none;border:none;color:var(--bad);cursor:pointer;font-size:16px;font-weight:800;padding:2px 4px}
+.check-row{display:flex;align-items:center;gap:10px;margin:8px 0}
+.check-row input[type=checkbox]{width:18px;height:18px;flex:0 0 auto}
+.check-row .campo{flex:1}
+.check-row input[type=number]{flex:0 0 auto;width:120px}
+.calc-total{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-top:1px solid var(--border)}
+.calc-total.final{border-top:2px solid var(--accent);margin-top:4px}
+.empty{text-align:center;color:var(--muted);padding:20px 8px}
+.overlay{position:fixed;inset:0;background:rgba(20,30,34,.55);z-index:60;display:flex;align-items:center;justify-content:center;padding:16px}
+.overlay .card{max-height:88vh;overflow:auto;width:100%;max-width:400px}
+.emojipick{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.emojipick button{font-size:20px;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:4px 8px;cursor:pointer}
+.emojipick button.sel{border-color:var(--accent);background:var(--accentsoft)}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--text);color:#fff;padding:9px 16px;border-radius:99px;font-size:13px;z-index:40}
+.toast.h{display:none}
+.sect{font-size:17px;margin:20px 0 8px}
+.catgrp{margin-bottom:12px}
+.cathd{display:flex;align-items:center;gap:8px;padding:8px 4px;cursor:pointer;font-family:'Quicksand';font-weight:700}
+.cathd .chev{color:var(--muted);transition:.2s}
+.cathd.cl .chev{transform:rotate(-90deg)}
+details.sd summary{cursor:pointer;font-weight:700;color:var(--text);list-style:none}
+details.sd summary::-webkit-details-marker{display:none}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+ <div style="display:flex;justify-content:space-between;align-items:center">
+  <h1 id="app-titulo">🧮 Calculadora de Precios</h1>
+  <button type="button" class="btn" id="btn-config" title="Configuración" style="padding:6px 10px">⚙️</button>
+ </div>
+</header>
+<main id="main"></main>
+</div>
+<div id="toast" class="toast h"></div>
+<script>
+const KEY='calcPreciosData';
+function uid(){return Math.random().toString(36).slice(2,9);}
+function fmt(n){return '$'+Math.round(n||0).toLocaleString('es-AR');}
+function seed(){return{
+ categorias:[{id:'cat_foto',nombre:'Fotolibros'},{id:'cat_gen',nombre:'General'}],
+ articulos:[
+  {id:uid(),categoriaId:'cat_foto',nombre:'22 páginas',costo:0,precio:0,descripcion:''},
+  {id:uid(),categoriaId:'cat_foto',nombre:'50 páginas',costo:0,precio:0,descripcion:''},
+  {id:uid(),categoriaId:'cat_foto',nombre:'80 páginas',costo:0,precio:0,descripcion:''},
+  {id:uid(),categoriaId:'cat_foto',nombre:'100 páginas',costo:0,precio:0,descripcion:''},
+  {id:uid(),categoriaId:'cat_foto',nombre:'120 páginas',costo:0,precio:0,descripcion:''},
+  {id:uid(),categoriaId:'cat_foto',nombre:'150 páginas',costo:0,precio:0,descripcion:''}
+ ],
+ categoriasExtras:[{id:'cext_pag',nombre:'Páginas'}],
+ opcionesExtra:[{id:'op1',categoriaId:'cext_pag',nombre:'Página extra',costo:0,precio:0}],
+ costos:{luz:0,manoObra:0,otros:0,incLuz:false,incManoObra:false,incOtros:false,diasMes:24,horasDia:5},
+ comisiones:{mp:0,ml:0},
+ config:{titulo:'Calculadora de Precios',icono:'🧮',gif:null}
+};}
+let db=load();
+function load(){
+ try{
+  const d=JSON.parse(localStorage.getItem(KEY));
+  if(!d)return seed();
+  if(!Array.isArray(d.categorias)){
+   // migración desde la versión anterior (niveles + insumos sueltos)
+   d.categorias=[{id:'cat_foto',nombre:'Fotolibros'},{id:'cat_gen',nombre:'General'}];
+   d.articulos=[];
+   (d.niveles||[]).forEach(n=>d.articulos.push({id:n.id||uid(),categoriaId:'cat_foto',nombre:(n.paginas||'?')+' páginas',costo:n.costo||0,precio:n.precio||0}));
+   (d.insumos||[]).forEach(i=>d.articulos.push({id:i.id||uid(),categoriaId:'cat_gen',nombre:i.nombre,costo:i.costo||0,precio:0}));
+   delete d.niveles;delete d.insumos;
+  }
+  if(!d.comisiones)d.comisiones={mp:0,ml:0};
+  if(!d.config)d.config={titulo:'Calculadora de Precios',icono:'🧮',gif:null};
+  if(!Array.isArray(d.categoriasExtras))d.categoriasExtras=[{id:'cext_pag',nombre:'Páginas'}];
+  if(!Array.isArray(d.opcionesExtra)){
+   d.opcionesExtra=[{id:uid(),categoriaId:d.categoriasExtras[0].id,nombre:'Página extra',costo:(d.extraPagina&&d.extraPagina.costo)||0,precio:(d.extraPagina&&d.extraPagina.precio)||0}];
+   delete d.extraPagina;
+  }
+  d.opcionesExtra.forEach(o=>{if(!o.categoriaId)o.categoriaId=d.categoriasExtras[0].id;});
+  (d.articulos||[]).forEach(a=>{if(a.descripcion==null)a.descripcion='';if(a.foto===undefined)a.foto=null;});
+  return d;
+ }catch(e){return seed();}
+}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true;}catch(e){toast('⚠️ No se pudo guardar: almacenamiento lleno.');return false;}}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.remove('h');clearTimeout(toast._t);toast._t=setTimeout(()=>t.classList.add('h'),2800);}
+function confirmar(msg,si,no){si=si||'Sí';no=no===undefined?'Cancelar':no;return new Promise(res=>{const o=document.createElement('div');o.className='overlay';o.style.zIndex=90;
+ o.innerHTML=`<div class="card" style="max-width:340px"><p style="margin-top:0">${msg}</p><div style="display:flex;gap:8px"><button type="button" class="btn p" id="cf-si" style="flex:1">${si}</button>${no?`<button type="button" class="btn" id="cf-no" style="flex:1">${no}</button>`:''}</div></div>`;
+ document.body.appendChild(o);o.querySelector('#cf-si').onclick=()=>{o.remove();res(true);};const n=o.querySelector('#cf-no');if(n)n.onclick=()=>{o.remove();res(false);};});}
+
+function precioConComision(neto,pct){return pct>0?neto/(1-pct/100):neto;}
+function comprimirImagenLimite(file,limiteBytes){
+ return new Promise((res,rej)=>{
+  const r=new FileReader();r.onerror=rej;
+  r.onload=()=>{
+   const im=new Image();im.onerror=rej;
+   im.onload=()=>{
+    let maxLado=420,calidad=0.75;
+    const intentar=()=>{
+     const k=Math.min(1,maxLado/Math.max(im.width,im.height));
+     const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+     c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+     const data=c.toDataURL('image/jpeg',calidad);
+     const bytes=Math.round(data.length*0.75);
+     if(bytes<=limiteBytes||(maxLado<=140&&calidad<=0.35))return res(data);
+     if(calidad>0.35)calidad-=0.15;else maxLado=Math.round(maxLado*0.8);
+     intentar();
+    };
+    intentar();
+   };
+   im.src=r.result;
+  };
+  r.readAsDataURL(file);
+ });
+}
+function costoIndirecto(horas){
+ const c=db.costos;
+ const mensual=(c.incLuz?c.luz:0)+(c.incManoObra?c.manoObra:0)+(c.incOtros?c.otros:0);
+ const porHora=mensual>0?mensual/(c.diasMes||24)/(c.horasDia||5):0;
+ return porHora*(horas||0);
+}
+
+let catAbiertas=new Set(),catExtraAbiertas=new Set(),artSel=null,extraOpcionSel=null,extraPagSel=0,horasCalc=0;
+let calcNombre='',calcCategoria=null,calcCosto=0,calcPrecio=0,calcUsarFijos=true,calcGananciaPct='';
+let seccionCostosAbierta=true,seccionExtraAbierta=true;
+let editArt=null;
+
+function go(){
+ document.getElementById('app-titulo').textContent=(db.config.icono||'🧮')+' '+(db.config.titulo||'Calculadora de Precios');
+ document.title=db.config.titulo||'Calculadora de Precios';
+ renderMain();
+}
+
+function renderMain(){
+ const m=document.getElementById('main');
+ if(artSel==null&&db.articulos.length){artSel=db.articulos[0].id;const a0=db.articulos[0];calcNombre=a0.nombre;calcCategoria=a0.categoriaId;calcCosto=a0.costo;calcPrecio=a0.precio;}
+ if(calcCategoria==null&&db.categorias.length)calcCategoria=db.categorias[0].id;
+ m.innerHTML=`
+<details class="sd" id="det-costos" ${seccionCostosAbierta?'open':''}><summary><h3 class="sect" style="display:inline;margin:20px 0 8px">Costos fijos y comisiones</h3></summary>
+ <div class="card">
+  <div class="check-row"><input type="checkbox" id="co-luz" ${db.costos.incLuz?'checked':''}><span class="campo">Luz (por mes)</span><input type="number" id="cg-luz" value="${db.costos.luz||0}"></div>
+  <div class="check-row"><input type="checkbox" id="co-mo" ${db.costos.incManoObra?'checked':''}><span class="campo">Mano de obra (por mes)</span><input type="number" id="cg-mo" value="${db.costos.manoObra||0}"></div>
+  <div class="check-row"><input type="checkbox" id="co-ot" ${db.costos.incOtros?'checked':''}><span class="campo">Otros <span class="meta">(servicios, alquiler, etc.)</span></span><input type="number" id="cg-ot" value="${db.costos.otros||0}"></div>
+  <div class="grid2"><div><label>Días de trabajo al mes</label><input type="number" id="cg-dias" value="${db.costos.diasMes||24}"></div><div><label>Horas de trabajo al día</label><input type="number" id="cg-horas" value="${db.costos.horasDia||5}"></div></div>
+  <div class="grid2" style="margin-top:8px">
+   <div><label>% comisión Mercado Pago</label><input type="number" id="cg-mp" value="${db.comisiones.mp||0}" step="0.1"></div>
+   <div><label>% comisión Mercado Libre</label><input type="number" id="cg-ml" value="${db.comisiones.ml||0}" step="0.1"></div>
+  </div>
+  <p class="meta" style="margin-top:8px">Tildá los que querés que sumen al precio. Quedan guardados para siempre.</p>
+ </div></details>
+
+ <details class="sd" id="det-extra" ${seccionExtraAbierta?'open':''}><summary><h3 class="sect" style="display:inline;margin:20px 0 8px">Extras</h3></summary>
+ <p class="meta" style="margin:0 0 8px">Cosas que se suman aparte de un artículo: páginas extra, argolla y cadenita de un llavero, etc.</p>
+ ${db.categoriasExtras.map(c=>{
+   const ops=db.opcionesExtra.filter(o=>o.categoriaId===c.id);
+   const ab=catExtraAbiertas.has(c.id);
+   return `<div class="catgrp"><div class="cathd ${ab?'':'cl'}" data-catext="${c.id}"><span class="chev">▾</span> ${c.nombre} <span class="meta">(${ops.length})</span>
+    <span style="flex:1"></span><button class="link" data-delcatext="${c.id}" title="Eliminar categoría">✕</button></div>
+    <div class="card" data-catextbody="${c.id}" style="display:${ab?'':'none'}">
+     ${ops.map(o=>`<div class="fila">
+       <input type="text" data-oen="${o.id}" value="${o.nombre}" style="flex:2;min-width:100px" placeholder="Nombre">
+       <span class="lbl">sale</span><input type="number" data-oec="${o.id}" value="${o.costo}">
+       <span class="lbl">vende</span><input type="number" data-oep="${o.id}" value="${o.precio}">
+       <button type="button" class="link" data-oedel="${o.id}" title="Quitar">✕</button></div>`).join('')||'<div class="empty">Sin extras en esta categoría</div>'}
+     <button type="button" class="btn" data-addextra="${c.id}" style="margin-top:6px">+ Extra</button>
+    </div></div>`;
+ }).join('')}
+ <div class="card"><form id="f-nueva-catext" class="fila"><input type="text" id="catext-n" placeholder="Nueva categoría de extra (ej: Llaveros)"><button class="btn">+ Crear categoría</button></form></div>
+ </details>
+
+ <h3 class="sect">Calculadora</h3>
+ <div class="card">
+  <label>Artículo guardado (opcional, autocompleta los datos)</label>
+  <select id="calc-articulo"><option value="">— ninguno / artículo nuevo —</option>${db.categorias.map(c=>{const arts=db.articulos.filter(a=>a.categoriaId===c.id);if(!arts.length)return'';return `<optgroup label="${c.nombre}">${arts.map(a=>`<option value="${a.id}" ${a.id===artSel?'selected':''}>${a.nombre}</option>`).join('')}</optgroup>`;}).join('')}</select>
+
+  <label>Nombre ${artSel?'':'(para crear uno nuevo al guardar)'}</label><input type="text" id="calc-nombre" value="${calcNombre}">
+  <label>Categoría</label><select id="calc-categoria">${db.categorias.map(c=>`<option value="${c.id}" ${c.id===calcCategoria?'selected':''}>${c.nombre}</option>`).join('')}</select>
+
+  <div class="grid2">
+   <div><label>Costo base</label><input type="number" id="calc-costo" value="${calcCosto}"></div>
+   <div><label>Precio de venta</label><input type="number" id="calc-precio" value="${calcPrecio}"></div>
+  </div>
+
+  <label>Extra (opcional)</label>
+  <div class="fila"><select id="calc-extra-opcion"><option value="">— ninguno —</option>${db.categoriasExtras.map(c=>{const ops=db.opcionesExtra.filter(o=>o.categoriaId===c.id);if(!ops.length)return'';return `<optgroup label="${c.nombre}">${ops.map(o=>`<option value="${o.id}" ${o.id===extraOpcionSel?'selected':''}>${o.nombre}</option>`).join('')}</optgroup>`;}).join('')}</select><input type="number" id="calc-extra" value="${extraPagSel}" min="0" placeholder="cantidad"></div>
+
+  <div class="check-row"><input type="checkbox" id="calc-usar-fijos" ${calcUsarFijos?'checked':''}><span class="campo">Sumar gastos fijos (luz/mano de obra/otros) a este cálculo</span></div>
+  <div class="check-row"><span class="campo">Horas de trabajo</span><input type="number" id="calc-horas" value="${horasCalc}" min="0" step="0.25"></div>
+  <label>% Ganancia deseada (opcional — recalcula el precio de venta solo)</label><input type="number" id="calc-ganancia-pct" value="${calcGananciaPct}" placeholder="ej: 40">
+
+  <div id="calc-resultado"></div>
+  <button type="button" class="btn p big" id="btn-guardar-calc" style="margin-top:10px">💾 ${artSel?'Actualizar':'Guardar'} en artículos guardados</button>
+ </div>
+
+
+ <h3 class="sect">Artículos guardados</h3>
+ ${renderCategorias()}
+ ${renderEditArt()}
+ <div class="card"><form id="f-nueva-cat" class="fila"><input type="text" id="cat-n" placeholder="Nueva categoría (ej: Cuadros)"><button class="btn">+ Crear categoría</button></form></div>
+ `;
+ wireAll();
+}
+
+function renderCategorias(){
+ return db.categorias.map(c=>{
+  const arts=db.articulos.filter(a=>a.categoriaId===c.id);
+  const abierta=catAbiertas.has(c.id);
+  return `<div class="catgrp"><div class="cathd ${abierta?'':'cl'}" data-cat="${c.id}"><span class="chev">▾</span> ${c.nombre} <span class="meta">(${arts.length})</span>
+   <span style="flex:1"></span><button class="link" data-delcat="${c.id}" title="Eliminar categoría">✕</button></div>
+   <div class="card" data-catbody="${c.id}" style="display:${abierta?'':'none'}">
+    ${arts.map(a=>{
+      const g=a.precio-a.costo;const gp=a.costo>0?(g/a.costo*100).toFixed(0):'—';
+      return `<div class="row">
+       <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+        ${a.foto?`<img src="${a.foto}" style="width:40px;height:40px;border-radius:9px;object-fit:cover;flex:0 0 auto">`:'<span style="font-size:22px;flex:0 0 auto">🖼️</span>'}
+        <div style="min-width:0">
+         <div style="font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${a.nombre}</div>
+         <div class="meta">Costo ${fmt(a.costo)} · Precio ${fmt(a.precio)} · Ganancia ${fmt(g)}${a.costo>0?` (${gp}%)`:''}</div>
+        </div>
+       </div>
+       <div style="display:flex;gap:6px;flex:0 0 auto">
+        <button type="button" class="btn" data-editart="${a.id}">Editar</button>
+        <button type="button" class="link" data-delart="${a.id}" title="Eliminar" style="font-size:18px">✕</button>
+       </div>
+      </div>`;
+    }).join('')||'<div class="empty">Sin artículos en esta categoría</div>'}
+   </div></div>`;
+ }).join('');
+}
+function renderEditArt(){
+ if(!editArt)return `<div class="card"><button type="button" class="btn big" id="btn-nuevo-articulo">+ Nuevo artículo</button></div>`;
+ return `<h3 class="sect">${editArt.esNuevo?'Nuevo artículo':'Editar artículo'}</h3>
+ <div class="card">
+  <label>Nombre</label><input id="ea-nombre" value="${editArt.nombre}">
+  <label>Categoría</label><select id="ea-categoria">${db.categorias.map(c=>`<option value="${c.id}" ${c.id===editArt.categoriaId?'selected':''}>${c.nombre}</option>`).join('')}</select>
+  <div class="grid2"><div><label>Costo</label><input type="number" id="ea-costo" value="${editArt.costo}"></div><div><label>Precio de venta</label><input type="number" id="ea-precio" value="${editArt.precio}"></div></div>
+  <label>Descripción (opcional)</label><input id="ea-desc" value="${editArt.descripcion||''}">
+  <label>Foto (opcional — se comprime sola hasta 250KB)</label>
+  <div class="fila"><input type="file" accept="image/*" id="ea-foto">${editArt.foto?`<img src="${editArt.foto}" style="width:40px;height:40px;border-radius:9px;object-fit:cover"><button type="button" class="link" id="ea-foto-del">✕</button>`:''}</div>
+  <div style="display:flex;gap:8px;margin-top:12px">
+   <button type="button" class="btn p big" id="ea-guardar">Guardar</button>
+   <button type="button" class="btn big" id="ea-cancelar">Cancelar</button>
+  </div>
+ </div>`;
+}
+
+function wireAll(){
+ // costos fijos y comisiones
+ ['co-luz','co-mo','co-ot'].forEach(id=>document.getElementById(id).onchange=(e)=>{
+  const map={'co-luz':'incLuz','co-mo':'incManoObra','co-ot':'incOtros'};db.costos[map[id]]=e.target.checked;save();calcular();
+ });
+ ['cg-luz','cg-mo','cg-ot','cg-dias','cg-horas'].forEach(id=>document.getElementById(id).onchange=(e)=>{
+  const map={'cg-luz':'luz','cg-mo':'manoObra','cg-ot':'otros','cg-dias':'diasMes','cg-horas':'horasDia'};db.costos[map[id]]=Number(e.target.value)||0;save();calcular();
+ });
+ document.getElementById('cg-mp').onchange=(e)=>{db.comisiones.mp=Number(e.target.value)||0;save();calcular();};
+ document.getElementById('cg-ml').onchange=(e)=>{db.comisiones.ml=Number(e.target.value)||0;save();calcular();};
+
+ // pagina extra (varias opciones)
+ document.querySelectorAll('[data-oen]').forEach(el=>el.onchange=()=>{db.opcionesExtra.find(o=>o.id===el.dataset.oen).nombre=el.value;save();renderMain();});
+ document.querySelectorAll('[data-oec]').forEach(el=>el.onchange=()=>{db.opcionesExtra.find(o=>o.id===el.dataset.oec).costo=Number(el.value)||0;save();calcular();});
+ document.querySelectorAll('[data-oep]').forEach(el=>el.onchange=()=>{db.opcionesExtra.find(o=>o.id===el.dataset.oep).precio=Number(el.value)||0;save();calcular();});
+ document.querySelectorAll('[data-oedel]').forEach(el=>el.onclick=async()=>{if(db.opcionesExtra.length<=1)return toast('Dejá al menos una opción');if(await confirmar('¿Quitar esta opción?')){db.opcionesExtra=db.opcionesExtra.filter(o=>o.id!==el.dataset.oedel);save();renderMain();}});
+ document.querySelectorAll('[data-addextra]').forEach(el=>el.onclick=()=>{db.opcionesExtra.push({id:uid(),categoriaId:el.dataset.addextra,nombre:'Nuevo extra',costo:0,precio:0});save();catExtraAbiertas.add(el.dataset.addextra);renderMain();});
+ document.querySelectorAll('[data-catext]').forEach(el=>el.onclick=()=>{
+  const id=el.dataset.catext;const b=document.querySelector(`[data-catextbody="${id}"]`);
+  if(catExtraAbiertas.has(id)){catExtraAbiertas.delete(id);el.classList.add('cl');b.style.display='none';}
+  else{catExtraAbiertas.add(id);el.classList.remove('cl');b.style.display='';}
+ });
+ document.querySelectorAll('[data-delcatext]').forEach(el=>el.onclick=async(ev)=>{
+  ev.stopPropagation();
+  const n=db.opcionesExtra.filter(o=>o.categoriaId===el.dataset.delcatext).length;
+  if(n)return confirmar(`Esta categoría tiene ${n} extra(s). Borralos primero.`,'Entendido','');
+  if(db.categoriasExtras.length<=1)return toast('Dejá al menos una categoría de extras');
+  if(await confirmar('¿Eliminar esta categoría de extras?')){db.categoriasExtras=db.categoriasExtras.filter(c=>c.id!==el.dataset.delcatext);save();renderMain();}
+ });
+ document.getElementById('f-nueva-catext').onsubmit=(e)=>{e.preventDefault();const n=document.getElementById('catext-n').value.trim();if(!n)return;db.categoriasExtras.push({id:uid(),nombre:n});save();renderMain();};
+ document.getElementById('det-costos').ontoggle=(e)=>{seccionCostosAbierta=e.target.open;};
+ document.getElementById('det-extra').ontoggle=(e)=>{seccionExtraAbierta=e.target.open;};
+
+ // calculadora
+ document.getElementById('calc-articulo').onchange=(e)=>{
+  artSel=e.target.value||null;
+  const art=db.articulos.find(a=>a.id===artSel);
+  if(art){calcNombre=art.nombre;calcCategoria=art.categoriaId;calcCosto=art.costo;calcPrecio=art.precio;}
+  else{calcNombre='';calcCosto=0;calcPrecio=0;}
+  calcGananciaPct='';
+  renderMain();
+ };
+ document.getElementById('calc-nombre').oninput=(e)=>{calcNombre=e.target.value;};
+ document.getElementById('calc-categoria').onchange=(e)=>{calcCategoria=e.target.value;};
+ document.getElementById('calc-costo').oninput=(e)=>{calcCosto=Number(e.target.value)||0;calcGananciaPct='';calcular();};
+ document.getElementById('calc-precio').oninput=(e)=>{calcPrecio=Number(e.target.value)||0;calcGananciaPct='';calcular();};
+ document.getElementById('calc-extra-opcion').onchange=(e)=>{extraOpcionSel=e.target.value||null;calcular();};
+ document.getElementById('calc-extra').oninput=(e)=>{extraPagSel=Number(e.target.value)||0;calcular();};
+ document.getElementById('calc-usar-fijos').onchange=(e)=>{calcUsarFijos=e.target.checked;calcular();};
+ document.getElementById('calc-horas').oninput=(e)=>{horasCalc=Number(e.target.value)||0;calcular();};
+ document.getElementById('calc-ganancia-pct').oninput=(e)=>{calcGananciaPct=e.target.value;calcular();};
+ document.getElementById('btn-guardar-calc').onclick=()=>{
+  if(!calcNombre.trim())return toast('Ponele un nombre al artículo');
+  if(!calcCategoria)return toast('Elegí una categoría');
+  calcular();
+  const opcion=db.opcionesExtra.find(o=>o.id===extraOpcionSel);
+  const costoBase=calcCosto+(opcion?extraPagSel*opcion.costo:0);
+  const indirecto=calcUsarFijos?costoIndirecto(horasCalc):0;
+  const costoFinal=costoBase+indirecto;
+  const precioFinal=calcPrecio+(opcion?extraPagSel*opcion.precio:0);
+  if(artSel){
+   const a=db.articulos.find(x=>x.id===artSel);
+   Object.assign(a,{nombre:calcNombre.trim(),categoriaId:calcCategoria,costo:costoFinal,precio:precioFinal});
+   toast('Artículo actualizado');
+  }else{
+   const nuevo={id:uid(),categoriaId:calcCategoria,nombre:calcNombre.trim(),costo:costoFinal,precio:precioFinal,descripcion:'',foto:null};
+   db.articulos.push(nuevo);artSel=nuevo.id;catAbiertas.add(calcCategoria);
+   toast('Artículo creado');
+  }
+  save();renderMain();
+ };
+
+ // categorias
+ document.querySelectorAll('[data-cat]').forEach(el=>el.onclick=()=>{
+  const id=el.dataset.cat;const b=document.querySelector(`[data-catbody="${id}"]`);
+  if(catAbiertas.has(id)){catAbiertas.delete(id);el.classList.add('cl');b.style.display='none';}
+  else{catAbiertas.add(id);el.classList.remove('cl');b.style.display='';}
+ });
+ document.querySelectorAll('[data-delcat]').forEach(el=>el.onclick=async(ev)=>{
+  ev.stopPropagation();
+  const n=db.articulos.filter(a=>a.categoriaId===el.dataset.delcat).length;
+  if(n)return confirmar(`Esta categoría tiene ${n} artículo(s). Borralos primero o movelos.`,'Entendido','');
+  if(await confirmar('¿Eliminar esta categoría?')){db.categorias=db.categorias.filter(c=>c.id!==el.dataset.delcat);save();renderMain();}
+ });
+ document.getElementById('f-nueva-cat').onsubmit=(e)=>{e.preventDefault();const n=document.getElementById('cat-n').value.trim();if(!n)return;db.categorias.push({id:uid(),nombre:n});save();renderMain();};
+
+ // articulos
+ document.querySelectorAll('[data-editart]').forEach(el=>el.onclick=()=>{
+  const a=db.articulos.find(x=>x.id===el.dataset.editart);
+  editArt={id:a.id,nombre:a.nombre,categoriaId:a.categoriaId,costo:a.costo,precio:a.precio,descripcion:a.descripcion||'',foto:a.foto||null,esNuevo:false};
+  renderMain();
+  const t=document.getElementById('ea-nombre');if(t)t.scrollIntoView({behavior:'smooth',block:'center'});
+ });
+ document.querySelectorAll('[data-delart]').forEach(el=>el.onclick=async()=>{if(await confirmar('¿Eliminar este artículo?')){db.articulos=db.articulos.filter(a=>a.id!==el.dataset.delart);save();renderMain();}});
+ const btnNuevoArt=document.getElementById('btn-nuevo-articulo');
+ if(btnNuevoArt)btnNuevoArt.onclick=()=>{editArt={id:null,nombre:'',categoriaId:(db.categorias[0]&&db.categorias[0].id)||null,costo:0,precio:0,descripcion:'',foto:null,esNuevo:true};renderMain();};
+ const eaNombre=document.getElementById('ea-nombre');
+ if(eaNombre){
+  document.getElementById('ea-categoria').onchange=(e)=>{editArt.categoriaId=e.target.value;};
+  document.getElementById('ea-foto').onchange=async(e)=>{
+   const f=e.target.files[0];if(!f)return;
+   try{editArt.foto=await comprimirImagenLimite(f,250*1024);renderMain();}catch(err){toast('No pude procesar esa imagen');}
+  };
+  const delFoto=document.getElementById('ea-foto-del');if(delFoto)delFoto.onclick=()=>{editArt.foto=null;renderMain();};
+  document.getElementById('ea-cancelar').onclick=()=>{editArt=null;renderMain();};
+  document.getElementById('ea-guardar').onclick=()=>{
+   const nombre=document.getElementById('ea-nombre').value.trim();if(!nombre)return toast('Ponele un nombre');
+   const categoriaId=document.getElementById('ea-categoria').value;
+   const costo=Number(document.getElementById('ea-costo').value)||0;
+   const precio=Number(document.getElementById('ea-precio').value)||0;
+   const descripcion=document.getElementById('ea-desc').value;
+   if(editArt.esNuevo){db.articulos.push({id:uid(),categoriaId,nombre,costo,precio,descripcion,foto:editArt.foto});catAbiertas.add(categoriaId);}
+   else{const a=db.articulos.find(x=>x.id===editArt.id);Object.assign(a,{nombre,categoriaId,costo,precio,descripcion,foto:editArt.foto});}
+   save();editArt=null;renderMain();toast('Guardado');
+  };
+ }
+
+ document.getElementById('btn-config').onclick=abrirConfig;
+ calcular();
+}
+
+function calcular(){
+ const el=document.getElementById('calc-resultado');if(!el)return;
+ const opcion=db.opcionesExtra.find(o=>o.id===extraOpcionSel);
+ const costoBase=calcCosto+(opcion?extraPagSel*opcion.costo:0);
+ const extraPrecio=opcion?extraPagSel*opcion.precio:0;
+ const indirecto=calcUsarFijos?costoIndirecto(horasCalc):0;
+ const costoTotal=costoBase+indirecto;
+ if(calcGananciaPct!==''&&calcGananciaPct!=null){
+  calcPrecio=Math.round((costoTotal)*(1+(Number(calcGananciaPct)||0)/100))-extraPrecio;
+  const pInput=document.getElementById('calc-precio');if(pInput)pInput.value=calcPrecio;
+ }
+ const precioBase=calcPrecio+extraPrecio;
+ const ganancia=precioBase-costoTotal;
+ const gananciaPct=costoTotal>0?(ganancia/costoTotal*100).toFixed(0):'—';
+ const mp=precioConComision(precioBase,db.comisiones.mp||0);
+ const ml=precioConComision(precioBase,db.comisiones.ml||0);
+ el.innerHTML=`
+  <div class="calc-total"><span>Costo total${calcUsarFijos&&indirecto>0?' (con gastos fijos)':''}</span><strong>${fmt(costoTotal)}</strong></div>
+  <div class="calc-total"><span>Precio de venta</span><strong>${fmt(precioBase)}</strong></div>
+  <div class="calc-total final"><span>Ganancia</span><strong style="color:${ganancia>=0?'var(--ok)':'var(--bad)'}">${fmt(ganancia)} ${costoTotal>0?`(${gananciaPct}%)`:''}</strong></div>
+  <div class="calc-total"><span>Precio en Mercado Pago (tu web) — ${db.comisiones.mp||0}% com.</span><strong>${fmt(mp)}</strong></div>
+  <div class="calc-total"><span>Precio en Mercado Libre — ${db.comisiones.ml||0}% com.</span><strong>${fmt(ml)}</strong></div>`;
+}
+
+/* ---------- configuración ---------- */
+function abrirConfig(){
+ const ICONOS=['🧮','📐','💰','💵','🧾','📊','📈','🖼️','📷','📔','📚','✂️','🎯','🛍️','🏷️'];
+ let icono=db.config.icono||'🧮';
+ const o=document.createElement('div');o.className='overlay';
+ o.innerHTML=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><h3 style="margin:0">Configuración</h3><button type="button" class="link" id="cfg-cerrar">✕</button></div>
+  <label>Nombre de la app</label><input type="text" id="cfg-titulo" value="${db.config.titulo||''}">
+  <label>Ícono</label><div class="emojipick" id="cfg-iconos">${ICONOS.map(e=>`<button type="button" data-ic="${e}" class="${e===icono?'sel':''}">${e}</button>`).join('')}</div>
+  <label>GIF al calcular (opcional, máx. 3MB)</label>
+  <div class="fila"><input type="file" id="cfg-gif" accept="image/*">${db.config.gif?`<button type="button" class="link" id="cfg-gif-del">✕</button>`:''}</div>
+  <button type="button" class="btn p big" id="cfg-guardar" style="margin-top:14px">Guardar</button>
+  <button type="button" class="btn d big" id="cfg-reset" style="margin-top:10px">Restablecer todo…</button></div>`;
+ document.body.appendChild(o);
+ o.querySelector('#cfg-cerrar').onclick=()=>o.remove();
+ o.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{icono=b.dataset.ic;o.querySelectorAll('[data-ic]').forEach(x=>x.classList.toggle('sel',x===b));});
+ let gifNuevo=null;
+ o.querySelector('#cfg-gif').onchange=(e)=>{const f=e.target.files[0];if(!f)return;if(f.size>3*1024*1024)return toast('Muy pesado, usá uno de menos de 3MB');const r=new FileReader();r.onload=()=>{gifNuevo=r.result;};r.readAsDataURL(f);};
+ const delBtn=o.querySelector('#cfg-gif-del');if(delBtn)delBtn.onclick=()=>{db.config.gif=null;save();o.remove();abrirConfig();};
+ o.querySelector('#cfg-guardar').onclick=()=>{db.config.titulo=o.querySelector('#cfg-titulo').value.trim()||'Calculadora de Precios';db.config.icono=icono;if(gifNuevo)db.config.gif=gifNuevo;save();o.remove();go();toast('Guardado');};
+ o.querySelector('#cfg-reset').onclick=async()=>{
+  if(!(await confirmar('⚠️ ¿Borrar todos los datos (artículos, categorías, comisiones) y empezar de nuevo?','Sí, seguir','No')))return;
+  if(!(await confirmar('Última confirmación: esto no se puede deshacer. ¿Restablecer definitivamente?','Sí, borrar todo','Cancelar')))return;
+  try{localStorage.removeItem(KEY);}catch(e){}
+  db=seed();save();o.remove();go();toast('Restablecido');
+ };
+}
+
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('service-worker.js').catch(()=>{});});}
+go();
+</script>
+</body>
+</html>
